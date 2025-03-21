@@ -19,9 +19,9 @@ class _NoteScreenState extends State<NoteScreen> {
     WidgetsBinding.instance.addPostFrameCallback(
       (timeStamp) async {
         await NoteScreenController.getAllNotes();
+        setState(() {});
       },
     );
-    setState(() {});
 
     super.initState();
   }
@@ -151,14 +151,51 @@ class _NoteScreenState extends State<NoteScreen> {
                       spacing: 10,
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          NoteScreenController.notesList[index]["title"],
-                          maxLines: 3,
-                          style: TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 20,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Text(
+                              NoteScreenController.notesList[index]["title"],
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: Colors.black,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 20,
+                              ),
+                            ),
+                            IconButton(
+                                onPressed: () async {
+                                  await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => AddNoteScreen(
+                                            isEdit: true,
+                                            noteId: NoteScreenController
+                                                .notesList[index]["id"],
+                                            noteTitle: NoteScreenController
+                                                .notesList[index]["title"],
+                                            date: NoteScreenController
+                                                .notesList[index]["date"],
+                                            des: NoteScreenController
+                                                .notesList[index]["des"],
+                                            category: NoteScreenController
+                                                .notesList[index]["category"]),
+                                      ));
+
+                                  // log("added a note ");
+                                  setState(() {});
+                                },
+                                icon: Icon(Icons.edit)),
+                            IconButton(
+                                onPressed: () async {
+                                  var noteId = NoteScreenController
+                                      .notesList[index]["id"];
+                                  await NoteScreenController.deleteNote(noteId);
+                                  setState(() {});
+                                },
+                                icon: Icon(Icons.delete))
+                          ],
                         ),
                         Text(
                           NoteScreenController.notesList[index]["des"],

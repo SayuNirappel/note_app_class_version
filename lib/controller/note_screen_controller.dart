@@ -87,10 +87,28 @@ class NoteScreenController {
     //
   }
 
+  //delete data from DB
+  static Future<void> deleteNote(var position) async {
+    await database.rawDelete('DELETE FROM Note WHERE id = ?', [position]);
+    await getAllNotes();
+  }
+
   // get data from DB
 
   static Future<void> getAllNotes() async {
     notesList = await database.rawQuery('SELECT * FROM Note');
     log(notesList.toString());
+  }
+
+  //update DB
+
+  static Future<void> updateNotes(
+      {required String title,
+      required String des,
+      required String date,
+      var noteId}) async {
+    await database.rawUpdate(
+        'UPDATE Note SET title = ?, des = ?, date = ?, category = ? WHERE id = ?',
+        [title, des, date, selectedCategory, noteId]);
   }
 }

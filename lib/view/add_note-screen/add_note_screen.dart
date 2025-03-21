@@ -2,8 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:note_app_class_version/controller/note_screen_controller.dart';
 
 class AddNoteScreen extends StatefulWidget {
-  const AddNoteScreen({super.key});
-
+  const AddNoteScreen(
+      {super.key,
+      this.isEdit = false,
+      this.noteTitle,
+      this.des,
+      this.date,
+      this.category,
+      this.noteId});
+  final bool isEdit;
+  final String? noteTitle;
+  final String? des;
+  final String? date;
+  final String? category;
+  final String? noteId;
   @override
   State<AddNoteScreen> createState() => _AddNoteScreenState();
 }
@@ -14,13 +26,28 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
   TextEditingController dateController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+
+  @override
+  void initState() {
+    if (widget.isEdit) {
+      titleController.text = widget.noteTitle ?? "";
+      desController.text = widget.des ?? "";
+      dateController.text = widget.date ?? "";
+      NoteScreenController.onCategorySelection(widget.category);
+      setState(() {});
+    } else {
+      NoteScreenController.onCategorySelection(null);
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         iconTheme: IconThemeData(color: Colors.white),
         title: Text(
-          "Add Note",
+          widget.isEdit == true ? "Update Note" : "Add Note",
           style: TextStyle(color: Colors.white),
         ),
       ),
@@ -166,10 +193,20 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
               ),
               InkWell(
                 onTap: () async {
-                  await NoteScreenController.addNote(
-                      title: titleController.text,
-                      des: desController.text,
-                      date: dateController.text);
+                  if (widget.isEdit) {
+                    //to edit exsisting note
+                    NoteScreenController.updateNotes(
+                        noteId: widget.noteId,
+                        title: titleController.text,
+                        des: desController.text,
+                        date: dateController.text);
+                  } else {
+                    //adding new note
+                    await NoteScreenController.addNote(
+                        title: titleController.text,
+                        des: desController.text,
+                        date: dateController.text);
+                  }
 
                   Navigator.pop(context);
                 },
@@ -181,7 +218,7 @@ class _AddNoteScreenState extends State<AddNoteScreen> {
                       borderRadius: BorderRadius.circular(10),
                       color: Colors.white),
                   child: Text(
-                    "Save",
+                    widget.isEdit ? "Update" : "Save",
                     style: TextStyle(
                         color: Colors.black, fontWeight: FontWeight.bold),
                   ),
